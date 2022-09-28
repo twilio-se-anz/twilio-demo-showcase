@@ -1,0 +1,43 @@
+{
+  "name": "twilio-showcase",
+  "description": "Showcase a set of things using Twilio Serverless + Airtable as a backend and NextJS + Twilio Paste as the frontend",
+  "author": "Christopher Connolly",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "test": "tsc --noEmit",
+    "start": "twilio-run --functions-folder serverless/dist/functions --assets-folder serverless/dist/assets",
+    "deploy": "twilio-run deploy --functions-folder serverless/dist/functions --assets-folder serverless/dist/assets",
+    "build": "tsc -b serverless",
+    "build:next": "next build && next export -o serverless/dist/assets/",
+    "dev": "next dev"
+  },
+  "dependencies": {
+    "airtable": "^0.11.5",
+    "twilio": "^3.56"
+  },
+  "devDependencies": {
+    "@next/eslint-plugin-next": "^12.2.1",
+    "@twilio-paste/core": "^15.1.0",
+    "@twilio-paste/icons": "^9.0.0",
+    "@types/node": "^17.0.33",
+    "@typescript-eslint/parser": "^5.30.5",
+    "axios": "^0.27.2",
+    "copyfiles": "^2.4.1",
+    "eslint": "^7.32.0",
+    "next": "^12.2.5",
+    "prop-types": "^15.8.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-scripts": "3.4.3",
+    "twilio-run": "^3.4.4",
+    "twilio-sync": "^0.12.2",
+    "typescript": "^4.7.4"
+  },
+  "engines": {
+    "node": "14"
+  },
+  "resolutions": {
+    "@types/react": "^17.0.31"
+  }
+}

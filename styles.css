@@ -1,0 +1,32 @@
+[data-paste-element|="LISTINGGRID"] {
+    /* justify-content: center; */
+}
+
+[data-paste-element|="LISTINGCARD"] {
+    padding-top: 1rem !important;
+    padding-bottom: 1rem !important;
+    min-width: 400px !important;
+    width: unset !important;
+    max-width: 400px !important;
+}
+
+@media screen and (min-width: 25rem) {
+    [data-paste-element|="LISTINGCARD"] {
+        min-width: 100%;
+    }
+}
+
+
+.fill {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden
+}
+
+.fill img {
+    flex-shrink: 0;
+    width: 300px;
+    height: 200px;
+    object-fit: contain;
+}
