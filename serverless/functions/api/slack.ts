@@ -64,13 +64,11 @@ export const handler: ServerlessFunctionSignature<MyFunctionContext, MyEvent> =
       console.log("Incoming event", event);
 
       // Get IP Info
-      let ip_info: IpInfo = await axios.request({
+      let ip_info = await axios.request({
         method: "post",
         baseURL: `http://ip-api.com/json/${event.context.ip}`,
       });
 
-      response.setBody(ip_info);
-      
       // Create slack web hook
       const payload = {
         type: event.type,
@@ -79,7 +77,7 @@ export const handler: ServerlessFunctionSignature<MyFunctionContext, MyEvent> =
         repo: event.properties.repo,
         ip: event.context.ip,
         userAgent: event.context.userAgent,
-        ...ip_info
+        ...ip_info.data,
       };
 
       const slack_options = {
@@ -91,7 +89,6 @@ export const handler: ServerlessFunctionSignature<MyFunctionContext, MyEvent> =
       await axios.request(slack_options);
 
       return callback(null, response);
-
     } catch (err) {
       console.error(err);
       response.setStatusCode(500);
