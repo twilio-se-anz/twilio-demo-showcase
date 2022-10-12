@@ -27,6 +27,22 @@ type MyEvent = {
   context: EventContext;
 };
 
+type IpInfo = {
+  country: string;
+  countryCode: string;
+  region: string;
+  regionName: string;
+  city: string;
+  zip: string;
+  lat: string;
+  lon: string;
+  timezone: string;
+  isp: string;
+  org: string;
+  as: string;
+  query: string;
+};
+
 // ***********************************************************
 //
 // SERVERLESS HANDLER ENTRY POINT
@@ -46,6 +62,16 @@ export const handler: ServerlessFunctionSignature<MyFunctionContext, MyEvent> =
 
     try {
       console.log("Incoming event", event);
+
+      // Get IP Info
+      let ip_info: IpInfo = await axios.request({
+        method: "post",
+        baseURL: `http://ip-api.com/json/${event.context.ip}`,
+      });
+
+      response.setBody(ip_info);
+      
+      // Create slack web hook
       const payload = {
         type: event.type,
         listing: event.properties.name,
@@ -53,17 +79,19 @@ export const handler: ServerlessFunctionSignature<MyFunctionContext, MyEvent> =
         repo: event.properties.repo,
         ip: event.context.ip,
         userAgent: event.context.userAgent,
+        ...ip_info
       };
 
-      const options = {
+      const slack_options = {
         method: "post",
         baseURL: context.SLACK_HOOK_URL,
         data: payload,
       };
 
-      await axios.request(options);
+      await axios.request(slack_options);
 
       return callback(null, response);
+
     } catch (err) {
       console.error(err);
       response.setStatusCode(500);
