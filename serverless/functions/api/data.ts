@@ -14,6 +14,8 @@ export type PluginListing = {
   repo: string;
   tags: string[];
   owner: string;
+  products: string[];
+  flags: string[];
 };
 
 export type MyFunctionContext = {
@@ -69,6 +71,8 @@ export const handler: ServerlessFunctionSignature<MyFunctionContext> =
               repo: record.get("Repo") as string,
               tags: record.get("Tags") as string[],
               owner: record.get("Owner") as string,
+              products: record.get("Products") as string[],
+              flags: record.get("Flags") as string[],
             });
           });
 
