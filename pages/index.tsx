@@ -30,7 +30,6 @@ const Home: NextPage = () => {
 
   useEffect(() => {
     console.log('tab selection changed', currentTab);
-
   }, [currentTab])
 
   const [loading, setLoading] = useState(true);
@@ -38,26 +37,41 @@ const Home: NextPage = () => {
   const [tags, setTags] = useState<string[]>();
 
   useEffect(() => {
-    try {
-      const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "";
-      fetch(baseUrl + "api/data")
-        .then((result) => result.json())
-        .then((result) => {
-          setData(result);
-          const tags: Array<string> = Array<string>();
-          result.map((item: PluginListing) => {
-            if (!item.tags) return;
-            item.tags.map((tag) => tags.push(tag));
-          });
-          const unique_tags: string[] = [...new Set<string>(tags)]; // [ 'A', 'B']
-          unique_tags.sort((a, b) => a.localeCompare(b));
-          console.log("Unique tags", unique_tags);
-          setTags(unique_tags);
-          setLoading(false);
+    const fetchData = async () => {
+      try {
+        const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "";
+        const response = await fetch(baseUrl + "api/data");
+
+        if (!response.ok) {
+          throw new Error(
+            `Error getting listing data: ${response.status} - ${response.statusText}`
+          );
+        }
+
+        const listingData = await response.json();
+
+        setData(listingData);
+
+        const tags: Array<string> = Array<string>();
+        listingData.map((item: PluginListing) => {
+          if (!item.tags) return;
+          item.tags.map((tag) => tags.push(tag));
         });
-    } catch (err) {
-      console.log("Error fetching listing data");
+
+        const unique_tags: string[] = [...new Set<string>(tags)]; // [ 'A', 'B']
+        unique_tags.sort((a, b) => a.localeCompare(b));
+        console.log("Unique tags", unique_tags);
+        setTags(unique_tags);
+        setLoading(false);
+      }
+
+      catch (err) {
+        console.error(err);
+        setLoading(false);
+      }
     }
+
+    fetchData();
   }, []);
 
   let loader = [1, 2, 3, 4, 5, 6];
