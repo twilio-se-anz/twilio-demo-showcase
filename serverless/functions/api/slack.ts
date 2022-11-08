@@ -80,13 +80,13 @@ export const handler: ServerlessFunctionSignature<MyFunctionContext, MyEvent> =
         ...ip_info.data,
       };
 
-      const slack_options = {
+      const slack_options: AxiosRequestConfig = {
         method: 'post',
         baseURL: context.SLACK_HOOK_URL,
         data: payload,
       };
 
-      await axios.request(slack_options as AxiosRequestConfig);
+      await axios.request(slack_options);
 
       return callback(null, response);
     } catch (err) {
