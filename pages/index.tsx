@@ -2,13 +2,12 @@ import Head from "next/head";
 import type { NextPage } from "next";
 import { Box } from "@twilio-paste/core/box";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Column,
   Flex,
   Heading,
   Paragraph,
-  SkeletonLoader,
   Spinner,
   Stack,
   Tab,
@@ -16,6 +15,7 @@ import {
   TabPanel,
   TabPanels,
   Tabs,
+  useTabState,
 } from "@twilio-paste/core";
 import { Header } from "../components/Header";
 import { PluginListing } from "../serverless/functions/api/data";
@@ -23,14 +23,21 @@ import { Listings } from "../components/Listings";
 import { LoadingCard } from "../components/LoadingCard";
 
 const Home: NextPage = () => {
-  const [tab, setTab] = React.useState("existing-tab");
-  const selectedId = "1";
+  const tabsBaseId = 'category-tabs';
+  const selectedId = `${tabsBaseId}-9`;
+
+  const currentTab = useTabState({ baseId: tabsBaseId, currentId: selectedId });
+
+  useEffect(() => {
+    console.log('tab selection changed', currentTab);
+
+  }, [currentTab])
 
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<Array<PluginListing>>();
   const [tags, setTags] = useState<string[]>();
 
-  React.useEffect(() => {
+  useEffect(() => {
     try {
       const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "";
       fetch(baseUrl + "api/data")
@@ -85,8 +92,8 @@ const Home: NextPage = () => {
       <Box padding={"space50"}>
         <Tabs
           orientation="vertical"
-          selectedId={selectedId}
-          baseId="vertical-tabs-example"
+          baseId={tabsBaseId}
+          state={currentTab}
         >
           <TabList aria-label="Vertical product tabs">
             <Tab id={selectedId}>(All)</Tab>
