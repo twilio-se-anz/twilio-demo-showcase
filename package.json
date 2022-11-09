@@ -13,6 +13,7 @@
     "dev": "next dev"
   },
   "dependencies": {
+    "@segment/analytics-next": "^1.43.2",
     "airtable": "^0.11.5",
     "twilio": "^3.56"
   },
@@ -22,7 +23,7 @@
     "@twilio-paste/icons": "^9.0.0",
     "@types/node": "^17.0.33",
     "@typescript-eslint/parser": "^5.30.5",
-    "axios": "^0.27.2",
+    "axios": "^1.1.2",
     "copyfiles": "^2.4.1",
     "eslint": "^7.32.0",
     "next": "^12.2.5",
