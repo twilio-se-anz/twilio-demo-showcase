@@ -7,10 +7,12 @@
   "scripts": {
     "test": "tsc --noEmit",
     "start": "twilio-run --functions-folder serverless/dist/functions --assets-folder serverless/dist/assets",
-    "deploy": "twilio-run deploy --functions-folder serverless/dist/functions --assets-folder serverless/dist/assets",
     "build": "tsc -b serverless",
-    "build:next": "next build && next export -o serverless/dist/assets/",
-    "dev": "next dev"
+    "build:next": "next build && next export -o serverless/dist/assets/ && copyfiles -f serverless/dist/assets/index.html serverless/dist/assets/assets",
+    "dev": "next dev",
+    "serverless:start": "cd serverless && twilio serverless start",
+    "serverless:build": "cd serverless && tsc",
+    "serverless:deploy": "npm run serverless:build && npm run build:next && cd serverless && twilio serverless deploy"
   },
   "dependencies": {
     "@segment/analytics-next": "^1.43.2",
