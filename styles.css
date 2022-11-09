@@ -1,3 +1,7 @@
+[data-paste-element|="CARD"] {
+    min-width: 390px;
+}
+
 [data-paste-element|="LISTINGGRID"] {
     /* justify-content: center; */
 }
@@ -15,7 +19,6 @@
         min-width: 100%;
     }
 }
-
 
 .fill {
     display: flex;

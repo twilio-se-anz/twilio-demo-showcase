@@ -1,15 +1,13 @@
 import Head from "next/head";
-import type { NextPage } from "next";
 import { useRouter } from "next/router";
-import React, { useState, useEffect } from "react";
+import dynamic from "next/dynamic";
+import type { NextPage } from "next";
 
-import { Box } from "@twilio-paste/core/box";
+import React, { useEffect, useState } from "react";
 import {
-  Column,
   Flex,
   Heading,
   Paragraph,
-  Spinner,
   Stack,
   Tab,
   TabList,
@@ -17,33 +15,48 @@ import {
   TabPanels,
   Tabs,
   useTabState,
+  Box,
 } from "@twilio-paste/core";
 
 import { Header } from "../components/Header";
 import { PluginListing } from "../serverless/functions/api/data";
 import { Listings } from "../components/Listings";
+import { useAnalytics } from "../components/Analytics";
+
+const Spinner = dynamic(
+  import("@twilio-paste/core/Spinner").then((mod) => mod.Spinner),
+  { ssr: false }
+); // disable ssr
 
 const Home: NextPage = () => {
-  const tabsBaseId = 'category-tabs';
-
+  const tabsBaseId = "category-tabs";
   const router = useRouter();
   const tab = useTabState({ baseId: tabsBaseId });
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<Array<PluginListing>>();
   const [tags, setTags] = useState<string[]>();
+  const analytics = useAnalytics();
+  const onActivateTab = (tag) => {
+    console.log("On Activate Tab", tag);
+    analytics.track("View Tag", { tag: tag });
+  };
+
+  React.useEffect(() => {
+    analytics.page();
+  }, []);
 
   // When the selected tab changes then we update the route if required
   useEffect(() => {
     const tabIndex = +tab.selectedId?.substring(tabsBaseId.length + 1);
 
-    if (typeof tabIndex === 'number' && !loading) {
+    if (typeof tabIndex === "number" && !loading) {
       // tabs start at 1 https://twitter.com/codinghorror/status/506010907021828096?lang=en
       const tag = tags[tabIndex - 1];
 
       // prevent a loop && don't overwrite the route on initial navigation
       if (router.query.tag !== tag) {
-        const newQuery = { tag }
-        console.log('tab changed, updating route query', newQuery);
+        const newQuery = { tag };
+        console.log("tab changed, updating route query", newQuery);
         router.push({ query: newQuery });
       }
     }
@@ -51,11 +64,11 @@ const Home: NextPage = () => {
 
   // When the route changes then we update the selected tab
   useEffect(() => {
-    if (tab.selectedId && typeof router.query.tag === 'string') {
+    if (tab.selectedId && typeof router.query.tag === "string") {
       console.log(`searching tabs for ${router.query.tag}`);
-      const tagIndex = tags.findIndex((t) => t === router.query.tag)
+      const tagIndex = tags.findIndex((t) => t === router.query.tag);
       if (tagIndex >= 0) {
-        console.log('router.query changed, updating tab to', tags[tagIndex]);
+        console.log("router.query changed, updating tab to", tags[tagIndex]);
         // tabs start at 1 https://twitter.com/codinghorror/status/506010907021828096?lang=en
         tab.select(`${tabsBaseId}-${tagIndex + 1}`);
       }
@@ -64,16 +77,18 @@ const Home: NextPage = () => {
 
   // After the tags are loaded, check route for selected tag
   useEffect(() => {
-    if (router.query.tag && typeof router.query.tag === 'string') {
-      const tagIndex = tags.findIndex((t) => t === router.query.tag)
+    if (router.query.tag && typeof router.query.tag === "string") {
+      const tagIndex = tags.findIndex((t) => t === router.query.tag);
       if (tagIndex >= 0) {
-        console.log('tags changed, updating selected tab to match query', tags[tagIndex]);
+        console.log(
+          "tags changed, updating selected tab to match query",
+          tags[tagIndex]
+        );
         // tabs start at 1 https://twitter.com/codinghorror/status/506010907021828096?lang=en
         tab.select(`${tabsBaseId}-${tagIndex + 1}`);
       }
     }
-  }, [tags])
-
+  }, [tags]);
 
   // Load data, runs once
   useEffect(() => {
@@ -107,13 +122,11 @@ const Home: NextPage = () => {
         setTags(unique_tags);
 
         setLoading(false);
-      }
-
-      catch (err) {
+      } catch (err) {
         console.error(err);
         setLoading(false);
       }
-    }
+    };
 
     fetchData();
   }, []);
@@ -148,13 +161,19 @@ const Home: NextPage = () => {
       </Head>
       <Header />
       <Box padding={"space50"}>
-        <Tabs
-          orientation="vertical"
-          baseId={tabsBaseId}
-          state={tab}
-        >
+        <Tabs orientation="vertical" baseId={tabsBaseId} state={tab}>
           <TabList aria-label="Vertical product tabs">
-            {tags && tags.map((name, index) => <Tab key={name}>{index === 0 ? `[${name}]` : name}</Tab>)}
+            {tags &&
+              tags.map((name, index) => (
+                <Tab
+                  key={name}
+                  onClick={() => {
+                    onActivateTab(name);
+                  }}
+                >
+                  {index === 0 ? `[${name}]` : name}
+                </Tab>
+              ))}
           </TabList>
 
           <TabPanels>
@@ -165,7 +184,11 @@ const Home: NextPage = () => {
                     {name}
                   </Heading>
                   <Listings
-                    data={index === 0 ? data : data.filter((item) => item.tags?.includes(name))}
+                    data={
+                      index === 0
+                        ? data
+                        : data.filter((item) => item.tags?.includes(name))
+                    }
                   />
                 </TabPanel>
               ))}
