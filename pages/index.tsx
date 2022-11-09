@@ -1,8 +1,9 @@
 import Head from "next/head";
 import type { NextPage } from "next";
-import { Box } from "@twilio-paste/core/box";
-
+import { useRouter } from "next/router";
 import React, { useState, useEffect } from "react";
+
+import { Box } from "@twilio-paste/core/box";
 import {
   Column,
   Flex,
@@ -17,25 +18,64 @@ import {
   Tabs,
   useTabState,
 } from "@twilio-paste/core";
+
 import { Header } from "../components/Header";
 import { PluginListing } from "../serverless/functions/api/data";
 import { Listings } from "../components/Listings";
-import { LoadingCard } from "../components/LoadingCard";
 
 const Home: NextPage = () => {
   const tabsBaseId = 'category-tabs';
-  const selectedId = `${tabsBaseId}-9`;
 
-  const currentTab = useTabState({ baseId: tabsBaseId, currentId: selectedId });
-
-  useEffect(() => {
-    console.log('tab selection changed', currentTab);
-  }, [currentTab])
-
+  const router = useRouter();
+  const tab = useTabState({ baseId: tabsBaseId });
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<Array<PluginListing>>();
   const [tags, setTags] = useState<string[]>();
 
+  // When the selected tab changes then we update the route if required
+  useEffect(() => {
+    const tabIndex = +tab.selectedId?.substring(tabsBaseId.length + 1);
+
+    if (typeof tabIndex === 'number' && !loading) {
+      // tabs start at 1 https://twitter.com/codinghorror/status/506010907021828096?lang=en
+      const tag = tags[tabIndex - 1];
+
+      // prevent a loop && don't overwrite the route on initial navigation
+      if (router.query.tag !== tag) {
+        const newQuery = { tag }
+        console.log('tab changed, updating route query', newQuery);
+        router.push({ query: newQuery });
+      }
+    }
+  }, [tab.selectedId]);
+
+  // When the route changes then we update the selected tab
+  useEffect(() => {
+    if (tab.selectedId && typeof router.query.tag === 'string') {
+      console.log(`searching tabs for ${router.query.tag}`);
+      const tagIndex = tags.findIndex((t) => t === router.query.tag)
+      if (tagIndex >= 0) {
+        console.log('router.query changed, updating tab to', tags[tagIndex]);
+        // tabs start at 1 https://twitter.com/codinghorror/status/506010907021828096?lang=en
+        tab.select(`${tabsBaseId}-${tagIndex + 1}`);
+      }
+    }
+  }, [router.query]);
+
+  // After the tags are loaded, check route for selected tag
+  useEffect(() => {
+    if (router.query.tag && typeof router.query.tag === 'string') {
+      const tagIndex = tags.findIndex((t) => t === router.query.tag)
+      if (tagIndex >= 0) {
+        console.log('tags changed, updating selected tab to match query', tags[tagIndex]);
+        // tabs start at 1 https://twitter.com/codinghorror/status/506010907021828096?lang=en
+        tab.select(`${tabsBaseId}-${tagIndex + 1}`);
+      }
+    }
+  }, [tags])
+
+
+  // Load data, runs once
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -60,8 +100,12 @@ const Home: NextPage = () => {
 
         const unique_tags: string[] = [...new Set<string>(tags)]; // [ 'A', 'B']
         unique_tags.sort((a, b) => a.localeCompare(b));
+
+        // Add "All" to the top of the list
+        unique_tags.unshift("All Plugins");
         console.log("Unique tags", unique_tags);
         setTags(unique_tags);
+
         setLoading(false);
       }
 
@@ -107,34 +151,21 @@ const Home: NextPage = () => {
         <Tabs
           orientation="vertical"
           baseId={tabsBaseId}
-          state={currentTab}
+          state={tab}
         >
           <TabList aria-label="Vertical product tabs">
-            <Tab id={selectedId}>(All)</Tab>
-            {tags && tags.map((name) => <Tab key={name}>{name}</Tab>)}
+            {tags && tags.map((name, index) => <Tab key={name}>{index === 0 ? `[${name}]` : name}</Tab>)}
           </TabList>
 
           <TabPanels>
-            <TabPanel>
-              <Heading as={"div"} variant={"heading10"}>
-                All Plugins
-              </Heading>
-              <Listings data={data} />
-              {loading &&
-                loader.map((i) => (
-                  <Column key={i} span={4} element="LISTINGCARD">
-                    <LoadingCard />
-                  </Column>
-                ))}
-            </TabPanel>
             {tags &&
-              tags.map((name) => (
+              tags.map((name, index) => (
                 <TabPanel key={name}>
                   <Heading as={"div"} variant={"heading10"}>
                     {name}
                   </Heading>
                   <Listings
-                    data={data.filter((item) => item.tags?.includes(name))}
+                    data={index === 0 ? data : data.filter((item) => item.tags?.includes(name))}
                   />
                 </TabPanel>
               ))}
