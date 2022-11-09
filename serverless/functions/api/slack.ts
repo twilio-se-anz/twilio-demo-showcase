@@ -1,10 +1,10 @@
-import axios from "axios";
-import "@twilio-labs/serverless-runtime-types";
+import axios, { AxiosRequestConfig } from 'axios';
+import '@twilio-labs/serverless-runtime-types';
 import {
   Context,
   ServerlessCallback,
   ServerlessFunctionSignature,
-} from "@twilio-labs/serverless-runtime-types/types";
+} from '@twilio-labs/serverless-runtime-types/types';
 
 export type MyFunctionContext = {
   SLACK_HOOK_URL: string;
@@ -55,17 +55,17 @@ export const handler: ServerlessFunctionSignature<MyFunctionContext, MyEvent> =
     callback: ServerlessCallback
   ) {
     const response = new Twilio.Response();
-    response.appendHeader("Access-Control-Allow-Origin", "*");
-    response.appendHeader("Access-Control-Allow-Methods", "OPTIONS, POST, GET");
-    response.appendHeader("Access-Control-Allow-Headers", "Content-Type");
-    response.appendHeader("Content-Type", "application/json");
+    response.appendHeader('Access-Control-Allow-Origin', '*');
+    response.appendHeader('Access-Control-Allow-Methods', 'OPTIONS, POST, GET');
+    response.appendHeader('Access-Control-Allow-Headers', 'Content-Type');
+    response.appendHeader('Content-Type', 'application/json');
 
     try {
-      console.log("Incoming event", event);
+      console.log('Incoming event', event);
 
       // Get IP Info
       let ip_info = await axios.request({
-        method: "post",
+        method: 'post',
         baseURL: `http://ip-api.com/json/${event.context.ip}`,
       });
 
@@ -80,8 +80,8 @@ export const handler: ServerlessFunctionSignature<MyFunctionContext, MyEvent> =
         ...ip_info.data,
       };
 
-      const slack_options = {
-        method: "post",
+      const slack_options: AxiosRequestConfig = {
+        method: 'post',
         baseURL: context.SLACK_HOOK_URL,
         data: payload,
       };
@@ -92,7 +92,7 @@ export const handler: ServerlessFunctionSignature<MyFunctionContext, MyEvent> =
     } catch (err) {
       console.error(err);
       response.setStatusCode(500);
-      response.setBody(err ? (err as string) : "Unknown error, check logs");
+      response.setBody(err ? (err as string) : 'Unknown error, check logs');
       return callback(null, response);
     }
   };
