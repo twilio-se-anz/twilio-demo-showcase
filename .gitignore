@@ -5,6 +5,9 @@
 serverless/.env
 serverless/dist
 
+# Mac crap
+.DS_Store
+
 # Build directories
 build/
 
