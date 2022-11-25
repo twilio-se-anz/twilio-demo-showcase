@@ -19,6 +19,7 @@ import { useAnalytics } from "../Analytics";
 
 export interface MediaCardProps {
   listing: PluginListing;
+  setSelected: any;
 }
 
 export const PluginListingCard: React.FC<MediaCardProps> = (
@@ -78,17 +79,17 @@ export const PluginListingCard: React.FC<MediaCardProps> = (
 
         {props.listing.repo && (
           <Anchor
-            target={"_blank"}
-            href={props.listing.repo}
+            href="#"
             onClick={() => {
-              analytics.track("View Listing", { ...props.listing });
+              analytics.track("View Detail", { ...props.listing });
+              props.setSelected(props.listing);
             }}
           >
-            Find the code here
+            View details
           </Anchor>
         )}
 
-        {props.listing.tags && (
+        {/* {props.listing.tags && (
           <Box display="flex" columnGap="space80">
             {props.listing.tags.map((tag) => (
               <Badge key={tag} as="span" variant="neutral">
@@ -96,7 +97,7 @@ export const PluginListingCard: React.FC<MediaCardProps> = (
               </Badge>
             ))}
           </Box>
-        )}
+        )} */}
       </Stack>
     </Card>
   );

@@ -22,6 +22,7 @@ import { Header } from "../components/Header";
 import { PluginListing } from "../serverless/functions/api/data";
 import { Listings } from "../components/Listings";
 import { useAnalytics } from "../components/Analytics";
+import { PluginListingPage } from "../components/PluginListingPage";
 
 const Spinner = dynamic(
   import("@twilio-paste/core/Spinner").then((mod) => mod.Spinner),
@@ -35,45 +36,60 @@ const Home: NextPage = () => {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<Array<PluginListing>>();
   const [tags, setTags] = useState<string[]>();
+  const [selected, _setSelected] = useState<PluginListing>();
+
   const analytics = useAnalytics();
   const onActivateTab = (tag) => {
     console.log("On Activate Tab", tag);
     analytics.track("View Tag", { tag: tag });
+    _setSelected(undefined);
+    router.push({ query: { tag: tag } });
+  };
+
+  const onSetSelected = (listing: PluginListing) => {
+    _setSelected(listing);
+    router.push({ query: { listing: listing.name } });
   };
 
   React.useEffect(() => {
     analytics.page();
   }, []);
 
-  // When the selected tab changes then we update the route if required
+  // When the route changes then we update the selected tab or choose a listing
   useEffect(() => {
-    const tabIndex = +tab.selectedId?.substring(tabsBaseId.length + 1);
-
-    if (typeof tabIndex === "number" && !loading) {
-      // tabs start at 1 https://twitter.com/codinghorror/status/506010907021828096?lang=en
-      const tag = tags[tabIndex - 1];
-
-      // prevent a loop && don't overwrite the route on initial navigation
-      if (router.query.tag !== tag) {
-        const newQuery = { tag };
-        console.log("tab changed, updating route query", newQuery);
-        router.push({ query: newQuery });
-      }
-    }
-  }, [tab.selectedId]);
-
-  // When the route changes then we update the selected tab
-  useEffect(() => {
+    // Tags
     if (tab.selectedId && typeof router.query.tag === "string") {
       console.log(`searching tabs for ${router.query.tag}`);
       const tagIndex = tags.findIndex((t) => t === router.query.tag);
       if (tagIndex >= 0) {
-        console.log("router.query changed, updating tab to", tags[tagIndex]);
+        console.log(
+          "router.query.tag changed, updating tab to",
+          tags[tagIndex]
+        );
         // tabs start at 1 https://twitter.com/codinghorror/status/506010907021828096?lang=en
         tab.select(`${tabsBaseId}-${tagIndex + 1}`);
       }
     }
-  }, [router.query]);
+  }, [router.query.tag]);
+
+  // When the route changes then we update the selected tab or choose a listing
+  useEffect(() => {
+    // Specific listing
+    if (data && typeof router.query.listing === "string") {
+      console.log(`searching listings for ${router.query.listing}`);
+
+      const listingIndex = data.findIndex(
+        (entry) => entry.name === router.query.listing
+      );
+      if (listingIndex >= 0) {
+        console.log(
+          "router.query.listing changed, showing listing ",
+          data[listingIndex]
+        );
+        onSetSelected(data[listingIndex]);
+      }
+    }
+  }, [router.query.listing]);
 
   // After the tags are loaded, check route for selected tag
   useEffect(() => {
@@ -89,6 +105,25 @@ const Home: NextPage = () => {
       }
     }
   }, [tags]);
+
+  // After the data are loaded, check route for selected listing
+  useEffect(() => {
+    // Specific listing
+    if (data && typeof router.query.listing === "string") {
+      console.log(`searching listings for ${router.query.listing}`);
+
+      const listingIndex = data.findIndex(
+        (entry) => entry.name === router.query.listing
+      );
+      if (listingIndex >= 0) {
+        console.log(
+          "data loaded/changed, showing listing ",
+          data[listingIndex]
+        );
+        onSetSelected(data[listingIndex]);
+      }
+    }
+  }, [data]);
 
   // Load data, runs once
   useEffect(() => {
@@ -133,6 +168,9 @@ const Home: NextPage = () => {
 
   let loader = [1, 2, 3, 4, 5, 6];
 
+  /***********************
+   * LOADING
+   ***********************/
   if (loading)
     return (
       <Box
@@ -153,6 +191,9 @@ const Home: NextPage = () => {
       </Box>
     );
 
+  /***********************
+   * DEFAULT INDEX
+   ***********************/
   return (
     <>
       <Head>
@@ -175,24 +216,29 @@ const Home: NextPage = () => {
                 </Tab>
               ))}
           </TabList>
-
-          <TabPanels>
-            {tags &&
-              tags.map((name, index) => (
-                <TabPanel key={name}>
-                  <Heading as={"div"} variant={"heading10"}>
-                    {name}
-                  </Heading>
-                  <Listings
-                    data={
-                      index === 0
-                        ? data
-                        : data.filter((item) => item.tags?.includes(name))
-                    }
-                  />
-                </TabPanel>
-              ))}
-          </TabPanels>
+          {selected && (
+            <PluginListingPage listing={selected} setSelected={onSetSelected} />
+          )}
+          {!selected && (
+            <TabPanels>
+              {tags &&
+                tags.map((name, index) => (
+                  <TabPanel key={name}>
+                    <Heading as={"div"} variant={"heading10"}>
+                      {name}
+                    </Heading>
+                    <Listings
+                      data={
+                        index === 0
+                          ? data
+                          : data.filter((item) => item.tags?.includes(name))
+                      }
+                      setSelected={onSetSelected}
+                    />
+                  </TabPanel>
+                ))}
+            </TabPanels>
+          )}
         </Tabs>
       </Box>
     </>

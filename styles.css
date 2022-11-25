@@ -33,3 +33,18 @@
     height: 200px;
     object-fit: contain;
 }
+
+
+
+.fill-large {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden
+}
+
+.fill-large img {
+    flex-shrink: 0;
+    height: 600px;
+    object-fit: contain;
+}
