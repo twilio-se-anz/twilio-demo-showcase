@@ -17,6 +17,7 @@ import {
 import { UserIcon } from "@twilio-paste/icons/cjs/UserIcon";
 import { PluginListing } from "../../serverless/functions/api/data";
 import { useAnalytics } from "../Analytics";
+import Moment from "react-moment";
 
 export interface PluginListingPageProps {
   listing: PluginListing;
@@ -127,6 +128,13 @@ export const PluginListingPage: React.FC<PluginListingPageProps> = (
                     <Avatar size="sizeIcon50" name="" icon={UserIcon} />
                     <p>{props.listing.owner}</p>
                   </Stack>
+                </Text>
+
+                <Heading as="h2" variant="heading40">
+                  Listing Last Modified
+                </Heading>
+                <Text as={"div"} marginBottom={"space50"}>
+                  <Moment date={props.listing.last_modified} fromNow />
                 </Text>
 
                 <Heading as="h2" variant="heading40">

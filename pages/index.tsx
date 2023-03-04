@@ -14,8 +14,11 @@ import {
   TabPanel,
   TabPanels,
   Tabs,
+  Text,
   useTabState,
   Box,
+  Button,
+  Anchor,
 } from "@twilio-paste/core";
 
 import { Header } from "../components/Header";
@@ -23,6 +26,8 @@ import { PluginListing } from "../serverless/functions/api/data";
 import { Listings } from "../components/Listings";
 import { useAnalytics } from "../components/Analytics";
 import { PluginListingPage } from "../components/PluginListingPage";
+
+import { FlagIcon } from "@twilio-paste/icons/cjs/FlagIcon";
 
 const Spinner = dynamic(
   import("@twilio-paste/core/Spinner").then((mod) => mod.Spinner),
@@ -153,6 +158,8 @@ const Home: NextPage = () => {
 
         // Add "All" to the top of the list
         unique_tags.unshift("All Plugins");
+        unique_tags.unshift("What's New?");
+
         console.log("Unique tags", unique_tags);
         setTags(unique_tags);
 
@@ -212,7 +219,7 @@ const Home: NextPage = () => {
                     onActivateTab(name);
                   }}
                 >
-                  {index === 0 ? `[${name}]` : name}
+                  {name}
                 </Tab>
               ))}
           </TabList>
@@ -231,6 +238,25 @@ const Home: NextPage = () => {
                       data={
                         index === 0
                           ? data
+                              .sort((a, b) =>
+                                a.last_modified > b.last_modified ? -1 : 1
+                              )
+                              .filter((item) => {
+                                const date_now = new Date();
+                                const date_updated = new Date(
+                                  item.last_modified
+                                );
+
+                                let difference =
+                                  date_now.getTime() - date_updated.getTime();
+                                let days = Math.ceil(
+                                  difference / (1000 * 3600 * 24)
+                                );
+
+                                return days <= 30 ? true : false;
+                              })
+                          : index === 1
+                          ? data.sort((a, b) => (a.name > b.name ? 1 : -1))
                           : data.filter((item) => item.tags?.includes(name))
                       }
                       setSelected={onSetSelected}

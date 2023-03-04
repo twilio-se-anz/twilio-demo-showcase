@@ -16,6 +16,7 @@ export type PluginListing = {
   owner: string;
   products: string[];
   flags: string[];
+  last_modified: string;
 };
 
 export type MyFunctionContext = {
@@ -61,8 +62,8 @@ export const handler: ServerlessFunctionSignature<MyFunctionContext> =
         })
         .eachPage(function page(records, fetchNextPage) {
           // This function (`page`) will get called for each page of records.
-
           records.forEach((record) => {
+            // console.log("Record", record);
             entries.push({
               name: record.get("Plugin") as string,
               category: record.get("Category") as string,
@@ -73,6 +74,7 @@ export const handler: ServerlessFunctionSignature<MyFunctionContext> =
               owner: record.get("Owner") as string,
               products: record.get("Products") as string[],
               flags: record.get("Flags") as string[],
+              last_modified: record.get("Last Modified") as string,
             });
           });
 

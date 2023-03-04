@@ -9,13 +9,17 @@ import {
   Paragraph,
   Stack,
   Anchor,
+  CalloutHeading,
+  Callout,
+  CalloutText,
 } from "@twilio-paste/core";
 
-import Link from "next/link";
+import moment from "moment";
 
 import { UserIcon } from "@twilio-paste/icons/cjs/UserIcon";
 import { PluginListing } from "../../serverless/functions/api/data";
 import { useAnalytics } from "../Analytics";
+import Moment from "react-moment";
 
 export interface MediaCardProps {
   listing: PluginListing;
@@ -27,9 +31,24 @@ export const PluginListingCard: React.FC<MediaCardProps> = (
 ) => {
   const analytics = useAnalytics();
 
+  const date_now = new Date();
+  const date_updated = new Date(props.listing.last_modified);
+
+  let difference = date_now.getTime() - date_updated.getTime();
+  let days = Math.ceil(difference / (1000 * 3600 * 24));
+
   return (
     <Card padding="space50">
       <Stack orientation={"vertical"} spacing={"space50"}>
+        {days <= 30 && (
+          <Callout variant="new">
+            <CalloutHeading as="h3">
+              Recently updated{" "}
+              <Moment date={props.listing.last_modified} fromNow />!
+            </CalloutHeading>
+          </Callout>
+        )}
+
         <Box
           alignContent={"center"}
           style={{
@@ -69,7 +88,7 @@ export const PluginListingCard: React.FC<MediaCardProps> = (
 
         <Stack orientation={"horizontal"} spacing={"space30"}>
           <Avatar size="sizeIcon50" name="" icon={UserIcon} />
-          <p>{props.listing.owner}</p>
+          <p>{props.listing.owner} </p>
         </Stack>
 
         <Paragraph>
@@ -77,10 +96,18 @@ export const PluginListingCard: React.FC<MediaCardProps> = (
             "Check out the source repository to see more information about this plugin."}
         </Paragraph>
 
+        <Paragraph>
+          Last modified{" "}
+          <strong>
+            <Moment date={props.listing.last_modified} fromNow />
+          </strong>
+        </Paragraph>
+
         {props.listing.repo && (
           <Anchor
-            href="#"
-            onClick={() => {
+            href={"?listing=" + encodeURIComponent(props.listing.name)}
+            onClick={(e) => {
+              e.preventDefault();
               analytics.track("View Detail", { ...props.listing });
               props.setSelected(props.listing);
             }}
