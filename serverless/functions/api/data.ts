@@ -20,7 +20,7 @@ export type PluginListing = {
 };
 
 export type MyFunctionContext = {
-  AIRTABLE_API_KEY: string;
+  AIRTABLE_TOKEN: string;
   AIRTABLE_BASE_ID: string;
   AIRTABLE_TABLE_NAME: string;
 };
@@ -44,7 +44,7 @@ export const handler: ServerlessFunctionSignature<MyFunctionContext> =
 
     // Authenticate
     Airtable.configure({
-      apiKey: context.AIRTABLE_API_KEY,
+      apiKey: context.AIRTABLE_TOKEN,
     });
 
     // Initialize a base
