@@ -47,7 +47,7 @@ export const ListingPage: React.FC<ListingPageProps> = (
               <Box
                 alignContent={"center"}
                 style={{
-                  backgroundColor: "whitesmoke",
+                  backgroundColor: "#333333",
                   textAlign: "center",
                 }}
               >
@@ -91,7 +91,12 @@ export const ListingPage: React.FC<ListingPageProps> = (
                       Products
                     </Heading>
                     <Text as={"div"} marginBottom={"space50"}>
-                      <Box display="flex" columnGap="space80">
+                      <Box
+                        display="flex"
+                        columnGap="space40"
+                        rowGap="space40"
+                        flexWrap="wrap"
+                      >
                         {props.listing.products &&
                           props.listing.products.map((product) => (
                             <Badge key={product} as="span" variant="new">
