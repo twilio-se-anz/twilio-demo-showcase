@@ -25,12 +25,6 @@ import { Listing } from "../serverless/functions/api/data";
 import { Listings } from "../components/Listings";
 import { useAnalytics } from "../components/Analytics";
 import { ListingPage } from "../components/ListingPage";
-import { Spinner } from "@twilio-paste/core/Spinner";
-
-// const Spinner = dynamic(
-//   import("@twilio-paste/core/Spinner").then((mod) => mod.Spinner),
-//   { ssr: false }
-// ); // disable ssr
 
 const Home: NextPage = () => {
   const tabsBaseId = "category-tabs";
@@ -193,11 +187,6 @@ const Home: NextPage = () => {
                   <img src={"intro.png"} width="150px" />
                 </Flex>
                 <Stack orientation={"horizontal"} spacing={"space100"}>
-                  <Spinner
-                    decorative={false}
-                    title="Loading"
-                    size="sizeIcon80"
-                  />
                   <Paragraph marginBottom="space0">
                     Loading Amazing Demos...
                   </Paragraph>
