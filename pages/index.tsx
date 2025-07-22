@@ -25,11 +25,12 @@ import { Listing } from "../serverless/functions/api/data";
 import { Listings } from "../components/Listings";
 import { useAnalytics } from "../components/Analytics";
 import { ListingPage } from "../components/ListingPage";
+import { Spinner } from "@twilio-paste/core/Spinner";
 
-const Spinner = dynamic(
-  import("@twilio-paste/core/Spinner").then((mod) => mod.Spinner),
-  { ssr: false }
-); // disable ssr
+// const Spinner = dynamic(
+//   import("@twilio-paste/core/Spinner").then((mod) => mod.Spinner),
+//   { ssr: false }
+// ); // disable ssr
 
 const Home: NextPage = () => {
   const tabsBaseId = "category-tabs";
