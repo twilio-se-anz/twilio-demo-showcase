@@ -1,20 +1,15 @@
 import "../styles.css";
 import type { AppProps, NextWebVitalsMetric } from "next/app";
-import { CustomizationProvider } from "@twilio-paste/core/customization";
+import { Theme } from "@twilio-paste/core/theme";
+
 import { AnalyticsProvider } from "../components/Analytics";
 
 const App: React.FC<AppProps> = ({ Component, pageProps }) => {
   return (
     <AnalyticsProvider writeKey={process.env.NEXT_PUBLIC_SEGMENT_WRITE_KEY}>
-      <CustomizationProvider
-        baseTheme="default"
-        theme={{
-          fonts: {},
-          textColors: {},
-        }}
-      >
+      <Theme.Provider theme="dark">
         <Component {...pageProps} />
-      </CustomizationProvider>
+      </Theme.Provider>
     </AnalyticsProvider>
   );
 };

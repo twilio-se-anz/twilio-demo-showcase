@@ -12,20 +12,21 @@ import {
   UnorderedList,
   ListItem,
   Button,
+  ButtonGroup,
 } from "@twilio-paste/core";
 
 import { UserIcon } from "@twilio-paste/icons/cjs/UserIcon";
-import { PluginListing } from "../../serverless/functions/api/data";
+import { Listing } from "../../serverless/functions/api/data";
 import { useAnalytics } from "../Analytics";
 import Moment from "react-moment";
 
-export interface PluginListingPageProps {
-  listing: PluginListing;
+export interface ListingPageProps {
+  listing: Listing;
   setSelected: any;
 }
 
-export const PluginListingPage: React.FC<PluginListingPageProps> = (
-  props: PluginListingPageProps
+export const ListingPage: React.FC<ListingPageProps> = (
+  props: ListingPageProps
 ) => {
   const analytics = useAnalytics();
 
@@ -68,7 +69,7 @@ export const PluginListingPage: React.FC<PluginListingPageProps> = (
                 </Heading>
                 <Paragraph>
                   {props.listing.description ||
-                    "Check out the source repository to see more information about this plugin."}
+                    "Check out the demo link to view this demo."}
                 </Paragraph>
 
                 <Heading as="h2" variant="heading40">
@@ -144,17 +145,33 @@ export const PluginListingPage: React.FC<PluginListingPageProps> = (
                   The button below may take you you to an external website not
                   provided by Twilio.
                 </Text>
-                <Button
-                  as="a"
-                  target={"_blank"}
-                  href={props.listing.repo}
-                  onClick={() => {
-                    analytics.track("View Listing", { ...props.listing });
-                  }}
-                  variant="primary"
-                >
-                  Find the code here
-                </Button>
+                <ButtonGroup>
+                  <Button
+                    as="a"
+                    target={"_blank"}
+                    href={props.listing.repo}
+                    onClick={() => {
+                      analytics.track("View Listing", { ...props.listing });
+                    }}
+                    variant="primary"
+                  >
+                    Open demo
+                  </Button>
+
+                  {props.listing.slides && (
+                    <Button
+                      as="a"
+                      target={"_blank"}
+                      href={props.listing.slides}
+                      onClick={() => {
+                        analytics.track("View Listing", { ...props.listing });
+                      }}
+                      variant="secondary"
+                    >
+                      Open Slides
+                    </Button>
+                  )}
+                </ButtonGroup>
               </Card>
             </Column>
           </Grid>

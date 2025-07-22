@@ -17,16 +17,16 @@ import {
 import moment from "moment";
 
 import { UserIcon } from "@twilio-paste/icons/cjs/UserIcon";
-import { PluginListing } from "../../serverless/functions/api/data";
+import { Listing } from "../../serverless/functions/api/data";
 import { useAnalytics } from "../Analytics";
 import Moment from "react-moment";
 
 export interface MediaCardProps {
-  listing: PluginListing;
+  listing: Listing;
   setSelected: any;
 }
 
-export const PluginListingCard: React.FC<MediaCardProps> = (
+export const ListingCard: React.FC<MediaCardProps> = (
   props: MediaCardProps
 ) => {
   const analytics = useAnalytics();
@@ -53,7 +53,7 @@ export const PluginListingCard: React.FC<MediaCardProps> = (
           alignContent={"center"}
           style={{
             width: "100%",
-            backgroundColor: "whitesmoke",
+            backgroundColor: "#333333",
             textAlign: "center",
           }}
         >
@@ -70,7 +70,12 @@ export const PluginListingCard: React.FC<MediaCardProps> = (
         </Heading>
 
         {(props.listing.products || props.listing.flags) && (
-          <Box display="flex" columnGap="space80">
+          <Box
+            display="flex"
+            columnGap="space40"
+            rowGap="space40"
+            flexWrap="wrap"
+          >
             {props.listing.products &&
               props.listing.products.map((product) => (
                 <Badge key={product} as="span" variant="new">

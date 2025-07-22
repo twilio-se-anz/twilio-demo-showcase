@@ -14,20 +14,17 @@ import {
   TabPanel,
   TabPanels,
   Tabs,
-  Text,
   useTabState,
   Box,
-  Button,
-  Anchor,
+  Card,
+  SkeletonLoader,
 } from "@twilio-paste/core";
 
 import { Header } from "../components/Header";
-import { PluginListing } from "../serverless/functions/api/data";
+import { Listing } from "../serverless/functions/api/data";
 import { Listings } from "../components/Listings";
 import { useAnalytics } from "../components/Analytics";
-import { PluginListingPage } from "../components/PluginListingPage";
-
-import { FlagIcon } from "@twilio-paste/icons/cjs/FlagIcon";
+import { ListingPage } from "../components/ListingPage";
 
 const Spinner = dynamic(
   import("@twilio-paste/core/Spinner").then((mod) => mod.Spinner),
@@ -39,9 +36,9 @@ const Home: NextPage = () => {
   const router = useRouter();
   const tab = useTabState({ baseId: tabsBaseId });
   const [loading, setLoading] = useState(true);
-  const [data, setData] = useState<Array<PluginListing>>();
+  const [data, setData] = useState<Array<Listing>>();
   const [tags, setTags] = useState<string[]>();
-  const [selected, _setSelected] = useState<PluginListing>();
+  const [selected, _setSelected] = useState<Listing>();
 
   const analytics = useAnalytics();
   const onActivateTab = (tag) => {
@@ -51,7 +48,7 @@ const Home: NextPage = () => {
     router.push({ query: { tag: tag } });
   };
 
-  const onSetSelected = (listing: PluginListing) => {
+  const onSetSelected = (listing: Listing) => {
     _setSelected(listing);
     router.push({ query: { listing: listing.name } });
   };
@@ -148,7 +145,7 @@ const Home: NextPage = () => {
         setData(listingData);
 
         const tags: Array<string> = Array<string>();
-        listingData.map((item: PluginListing) => {
+        listingData.map((item: Listing) => {
           if (!item.tags) return;
           item.tags.map((tag) => tags.push(tag));
         });
@@ -157,7 +154,7 @@ const Home: NextPage = () => {
         unique_tags.sort((a, b) => a.localeCompare(b));
 
         // Add "All" to the top of the list
-        unique_tags.unshift("All Plugins");
+        unique_tags.unshift("All Listings");
         unique_tags.unshift("What's New?");
 
         console.log("Unique tags", unique_tags);
@@ -187,12 +184,28 @@ const Home: NextPage = () => {
         marginBottom="space30"
         height={"100vh"}
       >
-        <Flex hAlignContent="center" vertical>
-          <Flex>
-            <Stack orientation={"horizontal"} spacing={"space100"}>
-              <Spinner decorative={false} title="Loading" size="sizeIcon80" />
-              <Paragraph>Loading...</Paragraph>
-            </Stack>
+        <Flex hAlignContent="center" vertical vAlignContent={"center"}>
+          <Flex vAlignContent={"center"}>
+            <Card>
+              <Stack orientation={"vertical"} spacing={"space40"}>
+                <Flex hAlignContent={"center"}>
+                  <img src={"intro.png"} width="150px" />
+                </Flex>
+                <Stack orientation={"horizontal"} spacing={"space100"}>
+                  <Spinner
+                    decorative={false}
+                    title="Loading"
+                    size="sizeIcon80"
+                  />
+                  <Paragraph marginBottom="space0">
+                    Loading Amazing Demos...
+                  </Paragraph>
+                </Stack>
+
+                <SkeletonLoader />
+                <SkeletonLoader />
+              </Stack>
+            </Card>
           </Flex>
         </Flex>
       </Box>
@@ -204,8 +217,18 @@ const Home: NextPage = () => {
   return (
     <>
       <Head>
-        <title>Showcase</title>
+        <title>APJ Demo Showcase</title>
+
         <link rel="icon" href="/favicon.ico" />
+        <link
+          rel="preconnect"
+          href="https://assets.twilio.com"
+          crossOrigin="anonymous"
+        />
+        <link
+          rel="stylesheet"
+          href="https://assets.twilio.com/public_assets/paste-fonts/1.5.2/fonts.css"
+        />
       </Head>
       <Header />
       <Box padding={"space50"}>
@@ -224,14 +247,14 @@ const Home: NextPage = () => {
               ))}
           </TabList>
           {selected && (
-            <PluginListingPage listing={selected} setSelected={onSetSelected} />
+            <ListingPage listing={selected} setSelected={onSetSelected} />
           )}
           {!selected && (
             <TabPanels>
               {tags &&
                 tags.map((name, index) => (
                   <TabPanel key={name}>
-                    <Heading as={"div"} variant={"heading10"}>
+                    <Heading as={"div"} variant={"heading20"}>
                       {name}
                     </Heading>
                     <Listings

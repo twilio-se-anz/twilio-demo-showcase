@@ -6,12 +6,12 @@ import {
   ServerlessFunctionSignature,
 } from "@twilio-labs/serverless-runtime-types/types";
 
-export type PluginListing = {
+export type Listing = {
   name: string;
-  category: string;
   description: string;
   image: string;
   repo: string;
+  slides: string;
   tags: string[];
   owner: string;
   products: string[];
@@ -53,8 +53,12 @@ export const handler: ServerlessFunctionSignature<MyFunctionContext> =
     // Reference a table
     const table = base(context.AIRTABLE_TABLE_NAME);
 
+    console.log(
+      `Accessing airtable base [${context.AIRTABLE_BASE_ID}] table [${context.AIRTABLE_TABLE_NAME}]`
+    );
+
     try {
-      let entries: Array<PluginListing> = new Array<PluginListing>();
+      let entries: Array<Listing> = new Array<Listing>();
 
       await table
         .select({
@@ -65,11 +69,11 @@ export const handler: ServerlessFunctionSignature<MyFunctionContext> =
           records.forEach((record) => {
             // console.log("Record", record);
             entries.push({
-              name: record.get("Plugin") as string,
-              category: record.get("Category") as string,
+              name: record.get("Demo Name") as string,
               description: record.get("Description") as string,
               image: record.get("Image") as string,
               repo: record.get("Repo") as string,
+              slides: record.get("Slides") as string,
               tags: record.get("Tags") as string[],
               owner: record.get("Owner") as string,
               products: record.get("Products") as string[],

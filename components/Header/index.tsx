@@ -11,7 +11,7 @@ export const Header: React.FC = () => {
     >
       <Flex hAlignContent="center" vertical>
         <Flex>
-          <h1 style={{ color: "white" }}>Flex Plugin and Use Case Showcase</h1>
+          <h1 style={{ color: "white" }}>APJ Demo Suite</h1>
         </Flex>
       </Flex>
     </Box>

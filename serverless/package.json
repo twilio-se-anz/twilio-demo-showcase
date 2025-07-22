@@ -1,6 +1,6 @@
 {
-  "name": "twilio-showcase-api",
-  "description": "API for Showcase",
+  "name": "twilio-apj-demo-showcase-api",
+  "description": "API for APJ Demo Showcase",
   "author": "Christopher Connolly",
   "version": "1.0.0",
   "private": true,
